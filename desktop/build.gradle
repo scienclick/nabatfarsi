@@ -1,0 +1,73 @@
+apply plugin: "java"
+
+sourceCompatibility = JavaVersion.VERSION_11
+sourceSets.main.java.srcDirs = ["src/"]
+
+project.ext.mainClassName = "com.nabatfarsi.desktop.DesktopLauncher"
+project.ext.assetsDir = new File("../android/assets")
+
+dependencies {
+    // If desktop depends on :core or other libraries, put them here, e.g.:
+    implementation project(":core")
+    // implementation "some:other:dependency:1.0"
+}
+
+// For running from the Gradle command line:
+task run(dependsOn: classes, type: JavaExec) {
+    main = project.mainClassName
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = project.assetsDir
+    ignoreExitValue = true
+}
+
+task debug(dependsOn: classes, type: JavaExec) {
+    main = project.mainClassName
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = project.assetsDir
+    ignoreExitValue = true
+    debug = true
+}
+
+// Create a fat Jar that includes all runtime dependencies
+task dist(type: Jar) {
+    // Modern Gradle uses 'classesDirs' (plural), but the old line might still work on some versions.
+    // We'll show the updated way:
+    from { sourceSets.main.output.classesDirs }
+    from { sourceSets.main.output.resourcesDir }
+    // Instead of referencing 'configurations.compile', include runtimeClasspath for a true "fat jar":
+    from {
+        configurations.runtimeClasspath.collect { zipTree(it) }
+    }
+    from files(project.assetsDir)
+
+    manifest {
+        attributes 'Main-Class': project.mainClassName
+    }
+}
+
+dist.dependsOn classes
+
+// Eclipse project config
+eclipse {
+    project {
+        name = appName + "-desktop"
+        // Link your assets directory so Eclipse sees it
+        linkedResource name: 'assets', type: '2', location: 'PARENT-1-PROJECT_LOC/android/assets'
+    }
+}
+
+// Post-processing Eclipse .classpath to add the assets folder
+task afterEclipseImport(description: "Post processing after project generation", group: "IDE") {
+    doLast {
+        def classpath = new XmlParser().parse(file(".classpath"))
+        new Node(classpath, "classpathentry", [ kind: 'src', path: 'assets' ])
+        def writer = new FileWriter(file(".classpath"))
+        def printer = new XmlNodePrinter(new PrintWriter(writer))
+        printer.setPreserveWhitespace(true)
+        printer.print(classpath)
+    }
+}
+
+java.targetCompatibility = JavaVersion.VERSION_11

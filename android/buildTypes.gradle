@@ -1,0 +1,25 @@
+signingConfigs {
+    releaseconfig {
+        keyAlias 'production.key'
+        keyPassword 'jhk1128fsma502'
+        storeFile file('C:/Users/ashamsa/Documents/SLB_home_Laptop/AndroidStudioProjects/AbnabatFarsi/android/AndroidAIP.production.jks')
+        storePassword 'jhk1128fsma502'
+    }
+}
+buildTypes {
+    debug {
+
+    }
+    release {
+        minifyEnabled true
+        shrinkResources true
+        zipAlignEnabled true
+        proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        proguardFiles 'proguard/proguard-LibGdx.pro'
+        //signingConfig signingConfig.release
+    }
+
+
+}
+
+
