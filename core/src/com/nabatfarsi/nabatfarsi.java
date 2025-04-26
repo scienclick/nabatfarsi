@@ -42,7 +42,7 @@ public class nabatfarsi extends Game {
         System.out.println(Gdx.files.internal("raw/BGO_loading.png").exists() ? "FOUND!" : "MISSING!");
 
         ////////////////////////////////
-        ISPURCHASED = false;//*****free* makes it free
+        ISPURCHASED = true;//*****free* makes it free
         GameManager.INSTANCE.update_is_purchased(ISPURCHASED);//*****free* makes it free
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
         GameManager.INSTANCE.update_current_Menu(0);
